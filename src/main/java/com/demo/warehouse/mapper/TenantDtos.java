@@ -3,6 +3,8 @@ package com.demo.warehouse.mapper;
 import java.time.Instant;
 import java.util.Set;
 
+import org.springframework.web.multipart.MultipartFile;
+
 import com.demo.warehouse.domain.ModuleType;
 
 import jakarta.validation.constraints.NotBlank;
@@ -23,6 +25,7 @@ public class TenantDtos {
         java.util.UUID id,
         @NotBlank
         String name,
+        MultipartFile logo,
         @NotNull
         Set<ModuleType> modules
     ) {}
@@ -38,6 +41,8 @@ public class TenantDtos {
         String name,
         Instant createdAt,
         Instant expiresAt,
+        String logoUrl,
+        String logoFileName,
         Set<ModuleType> modules
     ) {}
 }

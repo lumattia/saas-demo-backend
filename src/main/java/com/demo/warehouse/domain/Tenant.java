@@ -3,6 +3,7 @@ package com.demo.warehouse.domain;
 import jakarta.persistence.CollectionTable;
 import jakarta.persistence.Column;
 import jakarta.persistence.ElementCollection;
+import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -35,7 +36,8 @@ public class Tenant {
 
     @Column(nullable = false, unique = true, length = 120)
     private String name;
-
+    @Embedded
+    private FileInfo logo;
     @Column(nullable = false, updatable = false)
     private Instant createdAt;
 
@@ -55,5 +57,9 @@ public class Tenant {
     void prePersist() {
         createdAt = Instant.now();
         expiresAt = createdAt.plusSeconds(24 * 60 * 60);
+    }
+    public String Path(){
+        if (id == null) throw new IllegalStateException("No se puede generar la ruta de almacenamiento: el ID del tenant aún es nulo.");
+        return "tenants/" + id.toString();
     }
 }

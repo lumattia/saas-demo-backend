@@ -257,7 +257,7 @@ class TenantServiceTest {
 
     @Test
     void update_ShouldUpdateTenant() {
-        TenantDtos.TenantUpdateRequest request = new TenantDtos.TenantUpdateRequest(tenant.getId(), "Updated Tenant", Set.of(ModuleType.DRESS, ModuleType.DRESS_MOVEMENT));
+        TenantDtos.TenantUpdateRequest request = new TenantDtos.TenantUpdateRequest(tenant.getId(), "Updated Tenant", null, Set.of(ModuleType.DRESS, ModuleType.DRESS_MOVEMENT));
         when(tenantRepository.findById(tenant.getId())).thenReturn(Optional.of(tenant));
         when(tenantRepository.save(any(Tenant.class))).thenReturn(tenant);
         when(tenantMapper.toResponse(tenant)).thenReturn(tenantResponse);
@@ -272,7 +272,7 @@ class TenantServiceTest {
 
     @Test
     void update_ShouldThrowWhenTenantNotFound() {
-        TenantDtos.TenantUpdateRequest request = new TenantDtos.TenantUpdateRequest(tenant.getId(), "Updated Tenant", Set.of(ModuleType.DRESS));
+        TenantDtos.TenantUpdateRequest request = new TenantDtos.TenantUpdateRequest(tenant.getId(), "Updated Tenant", null, Set.of(ModuleType.DRESS));
         when(tenantRepository.findById(tenant.getId())).thenReturn(Optional.empty());
 
         assertThrows(RuntimeException.class, () -> tenantService.update(request));

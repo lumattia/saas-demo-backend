@@ -7,6 +7,12 @@ auth0:
     clientSecret: ${AUTH0_CLIENT_SECRET}
     connection: Username-Password-Authentication
 
+r2:
+  access-key-id: ${R2_ACCESS_KEY}
+  secret-access-key: ${R2_SECRET_KEY}
+  endpoint: https://79938d71e2a70ba2ea7db93f1f6ca9e1.r2.cloudflarestorage.com
+  bucket-name: portafolio
+
 spring:
   datasource:
     url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/warehouse_db}

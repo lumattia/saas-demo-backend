@@ -1,6 +1,7 @@
 package com.demo.warehouse.scheduler;
 
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
 
 import jakarta.persistence.EntityManager;
@@ -10,11 +11,13 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.demo.warehouse.domain.FileInfo;
 import com.demo.warehouse.domain.Tenant;
 import com.demo.warehouse.domain.User;
 import com.demo.warehouse.repository.TenantRepository;
 import com.demo.warehouse.repository.UserRepository;
 import com.demo.warehouse.service.Auth0ManagementService;
+import com.demo.warehouse.storage.FileStorageService;
 
 @Slf4j
 @Component
@@ -24,6 +27,7 @@ public class TenantCleanupScheduler {
     private final TenantRepository tenantRepository;
     private final UserRepository userRepository;
     private final Auth0ManagementService auth0ManagementService;
+    private final FileStorageService fileService;
     private final EntityManager entityManager;
 
     @Transactional
@@ -33,8 +37,11 @@ public class TenantCleanupScheduler {
         if (expiredTenants.isEmpty()) {
             return;
         }
-
+        List<FileInfo> filesToDelete = new ArrayList<>();
         for (Tenant tenant : expiredTenants) {
+            if (tenant.getLogo() != null) {
+                filesToDelete.add(tenant.getLogo());
+            }
             // Delete associated users from Auth0 if they have sub
             List<User> users = userRepository.findByTenantId(tenant.getId());
             for (User user : users) {
@@ -45,7 +52,9 @@ public class TenantCleanupScheduler {
             }
         }
         tenantRepository.deleteAll(expiredTenants);
-
+        for (FileInfo fileInfo : filesToDelete) {
+            fileService.deleteFileLog(fileInfo);
+        }
         log.info("Removed {} expired tenants and their Auth0 users", expiredTenants.size());
     }
 }

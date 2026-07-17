@@ -154,7 +154,7 @@ class TenantControllerTest {
     @Test
     @WithMockUser(authorities = {"ROLE_SUPERADMIN"})
     void update_ShouldReturnUpdatedTenant() throws Exception {
-        TenantDtos.TenantUpdateRequest request = new TenantDtos.TenantUpdateRequest(tenant.getId(), "Updated Tenant", Set.of(ModuleType.DRESS));
+        TenantDtos.TenantUpdateRequest request = new TenantDtos.TenantUpdateRequest(tenant.getId(), "Updated Tenant", null, Set.of(ModuleType.DRESS));
         when(tenantService.update(any())).thenReturn(tenantResponse);
 
         mockMvc.perform(put("/tenants/update/" + tenant.getId())

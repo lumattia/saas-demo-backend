@@ -11,6 +11,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.demo.warehouse.domain.FileInfo;
 import com.demo.warehouse.domain.Tenant;
 import com.demo.warehouse.domain.User;
 import com.demo.warehouse.domain.UserRole;
@@ -20,6 +21,7 @@ import com.demo.warehouse.mapper.TenantDtos;
 import com.demo.warehouse.mapper.TenantMapper;
 import com.demo.warehouse.repository.TenantRepository;
 import com.demo.warehouse.repository.UserRepository;
+import com.demo.warehouse.storage.FileStorageService;
 import com.demo.warehouse.tenantFilter.UserContextHolder;
 
 import jakarta.annotation.Nonnull;
@@ -31,6 +33,7 @@ public class TenantService {
     private final TenantMapper tenantMapper;
     private final TenantRepository tenantRepository;
     private final UserRepository userRepository;
+    private final FileStorageService fileService;
 
     @Transactional(readOnly = true)
     public Page<TenantDtos.TenantResponse> page(Specification<Tenant> spec, @Nonnull Pageable pageable) {
@@ -102,12 +105,30 @@ public class TenantService {
                 .orElseThrow(() -> new RuntimeException("Tenant not found"));
         tenant.setName(request.name());
         tenant.setModules(request.modules());
-        tenantRepository.save(tenant);
+        
+        var logo = request.logo();
+        if (logo != null) {
+            if (logo.isEmpty() && tenant.getLogo() != null) {
+                FileInfo oldFile = tenant.getLogo();
+                tenant.setLogo(null);
+                tenantRepository.save(tenant);
+                fileService.deleteFileLog(oldFile);
+            } else{
+                fileService.safeReplace(tenant.getLogo(), logo, tenant.Path(), (fileInfo) -> {
+                    tenant.setLogo(fileInfo);
+                    tenantRepository.save(tenant);
+                });
+            }
+        }
         return tenantMapper.toResponse(tenant);
     }
     
     @Transactional
     public void delete(UUID toDeleteId) {
+        var tenant = tenantRepository.findById(toDeleteId);
+        if (tenant.isPresent() && tenant.get().getLogo() != null) {
+            fileService.deleteFileLog(tenant.get().getLogo());
+        }
         tenantRepository.deleteById(toDeleteId);
     }
 }
