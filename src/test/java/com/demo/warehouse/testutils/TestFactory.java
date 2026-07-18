@@ -8,6 +8,7 @@ import com.demo.warehouse.domain.User;
 import com.demo.warehouse.domain.UserRole;
 import com.demo.warehouse.mapper.DressDtos;
 import com.demo.warehouse.mapper.TenantDtos;
+import com.demo.warehouse.mapper.TenantDtos.TenantResponse;
 import com.demo.warehouse.mapper.UserDto;
 import com.demo.warehouse.tenantFilter.UserContext;
 import com.demo.warehouse.tenantFilter.UserContextHolder;
@@ -76,7 +77,9 @@ public class TestFactory {
     public static Tenant createDefaultTenant() {
         return createTenant(UUID.randomUUID(), "Test Tenant", Set.of(ModuleType.DRESS));
     }
-
+    public static TenantResponse toTenantResponse(Tenant tenant) {
+        return new TenantResponse(tenant.getId(), null, null , null, null, null, false);
+    }
     public static TenantDtos.TenantResponse createTenantResponse(UUID id, String name, Set<ModuleType> modules) {
         return TenantDtos.TenantResponse.builder()
                 .id(id)

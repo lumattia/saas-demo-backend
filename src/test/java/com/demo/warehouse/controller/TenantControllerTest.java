@@ -30,6 +30,7 @@ import java.time.Instant;
 import java.util.*;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -182,7 +183,7 @@ class TenantControllerTest {
     @Test
     @WithMockUser
     void switchTenant_ShouldSwitchTenant() throws Exception {
-        UserDto.LoggedUserDto loggedUserDto = new UserDto.LoggedUserDto(1L, "testuser", "auth0sub", UserRole.ADMIN, tenant);
+        UserDto.LoggedUserDto loggedUserDto = new UserDto.LoggedUserDto(1L, "testuser", "auth0sub", UserRole.ADMIN, TestFactory.toTenantResponse(tenant));
         when(userService.switchTenant(tenant.getId())).thenReturn(loggedUserDto);
 
         mockMvc.perform(post("/tenants/switch/" + tenant.getId())

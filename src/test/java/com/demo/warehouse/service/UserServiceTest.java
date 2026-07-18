@@ -191,7 +191,7 @@ class UserServiceTest {
     void switchTenant_ShouldSwitchTenantForSuperAdmin() {
         when(tenantRepository.findById(tenant.getId())).thenReturn(Optional.of(tenant));
         when(userRepository.save(any(User.class))).thenReturn(user);
-        when(userMapper.toLogged(user)).thenReturn(new UserDto.LoggedUserDto(1L, "testuser", "auth0sub", UserRole.ADMIN, tenant));
+        when(userMapper.toLogged(user)).thenReturn(new UserDto.LoggedUserDto(1L, "testuser", "auth0sub", UserRole.ADMIN, TestFactory.toTenantResponse(tenant)));
 
         UserDto.LoggedUserDto result = userService.switchTenant(tenant.getId());
 
@@ -208,7 +208,7 @@ class UserServiceTest {
 
         when(tenantRepository.findById(tenant.getId())).thenReturn(Optional.of(tenant));
         when(userRepository.save(any(User.class))).thenReturn(user);
-        when(userMapper.toLogged(user)).thenReturn(new UserDto.LoggedUserDto(1L, "testuser", "auth0sub", UserRole.RESELLER, tenant));
+        when(userMapper.toLogged(user)).thenReturn(new UserDto.LoggedUserDto(1L, "testuser", "auth0sub", UserRole.RESELLER, TestFactory.toTenantResponse(tenant)));
 
         UserDto.LoggedUserDto result = userService.switchTenant(tenant.getId());
 

@@ -12,7 +12,8 @@ r2:
   secret-access-key: ${R2_SECRET_KEY}
   endpoint: https://79938d71e2a70ba2ea7db93f1f6ca9e1.r2.cloudflarestorage.com
   bucket-name: portafolio
-
+  public-url: https://mi-proxy-imagenes.lumattia88.workers.dev
+  
 spring:
   datasource:
     url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/warehouse_db}

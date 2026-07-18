@@ -5,6 +5,7 @@ import java.util.UUID;
 
 import com.demo.warehouse.domain.Tenant;
 import com.demo.warehouse.domain.UserRole;
+import com.demo.warehouse.mapper.TenantDtos.TenantResponse;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -16,7 +17,7 @@ public class UserDto {
         String username,
         String auth0Sub,
         UserRole role,
-        Tenant tenant
+        TenantResponse tenant
     ) {}
 
     public static record UserCreateRequest(

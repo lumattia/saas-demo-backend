@@ -7,7 +7,7 @@ import com.demo.warehouse.domain.User;
 import com.demo.warehouse.mapper.UserDto.LoggedUserDto;
 import com.demo.warehouse.mapper.UserDto.UserResponse;
 
-@Mapper(componentModel = "spring")
+@Mapper(componentModel = "spring", uses = { TenantMapper.class })
 public interface UserMapper {
     LoggedUserDto toLogged(User entity);
     @Mapping(target = "isEditable", expression = "java(calculateIsEditable(entity))")

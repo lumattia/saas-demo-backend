@@ -1,32 +1,38 @@
 package com.demo.warehouse.controller;
 
+import java.util.List;
+
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
+import org.springframework.beans.factory.annotation.Autowired;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.test.web.servlet.MockMvc;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+import com.demo.warehouse.domain.FieldValidations;
 import com.demo.warehouse.domain.ModuleType;
 import com.demo.warehouse.domain.Tenant;
-import com.demo.warehouse.domain.FieldValidations;
 import com.demo.warehouse.mapper.CustomFieldDtos;
 import com.demo.warehouse.repository.UserRepository;
 import com.demo.warehouse.service.CustomFieldService;
 import com.demo.warehouse.testutils.TestFactory;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
-import org.springframework.test.web.servlet.MockMvc;
-
-import java.util.List;
-
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 @org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest(CustomFieldController.class)
 class CustomFieldControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
+    private ObjectMapper objectMapper;
 
     @MockitoBean
     private CustomFieldService customFieldService;
@@ -36,6 +42,8 @@ class CustomFieldControllerTest {
 
     @BeforeEach
     void setUp() {
+        this.objectMapper = new ObjectMapper();
+        this.objectMapper.findAndRegisterModules();
         tenant = TestFactory.createDefaultTenant();
         TestFactory.setUserContextHolder(TestFactory.createDefaultUser(tenant));
     }
@@ -110,7 +118,7 @@ class CustomFieldControllerTest {
         mockMvc.perform(post("/custom-fields/groups")
                         .with(csrf())
                         .contentType(org.springframework.http.MediaType.APPLICATION_JSON)
-                        .content("{\"name\":\"Test Group\",\"groupOrder\":0,\"module\":\"DRESS\"}"))
+                        .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.name").value("Test Group"));
     }
@@ -129,7 +137,7 @@ class CustomFieldControllerTest {
         mockMvc.perform(put("/custom-fields/groups/1")
                         .with(csrf())
                         .contentType(org.springframework.http.MediaType.APPLICATION_JSON)
-                        .content("{\"id\":1,\"name\":\"Updated Group\",\"groupOrder\":1,\"module\":\"DRESS\"}"))
+                        .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.name").value("Updated Group"));
     }
@@ -155,7 +163,7 @@ class CustomFieldControllerTest {
         mockMvc.perform(post("/custom-fields/definitions")
                         .with(csrf())
                         .contentType(org.springframework.http.MediaType.APPLICATION_JSON)
-                        .content("{\"groupId\":1,\"label\":\"Test Field\",\"type\":\"TEXT\",\"fieldOrder\":0}"))
+                        .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.label").value("Test Field"));
     }
@@ -169,12 +177,12 @@ class CustomFieldControllerTest {
             1L, 1L, "Updated Field", com.demo.warehouse.domain.CustomFieldType.TEXT, 1, new FieldValidations(false, null, null, null, null), null
         );
         
-        when(customFieldService.updateDefinition(any())).thenReturn(response);
+        when(customFieldService.updateDefinition(any())).thenReturn(null);
 
         mockMvc.perform(put("/custom-fields/definitions/1")
                         .with(csrf())
                         .contentType(org.springframework.http.MediaType.APPLICATION_JSON)
-                        .content("{\"id\":1,\"groupId\":1,\"label\":\"Updated Field\",\"type\":\"TEXT\",\"fieldOrder\":1}"))
+                        .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.label").value("Updated Field"));
     }

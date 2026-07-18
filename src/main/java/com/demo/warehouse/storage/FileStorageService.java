@@ -1,20 +1,20 @@
 package com.demo.warehouse.storage;
 
+import java.util.Base64;
+import java.util.UUID;
+import java.util.function.Consumer;
+
+import org.springframework.stereotype.Service;
+
 import com.demo.warehouse.config.R2Properties;
 import com.demo.warehouse.domain.FileInfo;
+import com.demo.warehouse.mapper.FileInfoDtos.FileInfoRequest;
 
 import lombok.extern.slf4j.Slf4j;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.DeleteObjectRequest;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
-
-import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
-
-import java.io.IOException;
-import java.util.UUID;
-import java.util.function.Consumer;
 
 @Slf4j
 @Service
@@ -27,29 +27,42 @@ public class FileStorageService {
         this.s3Client = s3Client;
         this.r2Properties = r2Properties;
     }
+    public byte[] parseBase64(String base64){
+        if (base64.contains(",")) {
+            base64 = base64.split(",")[1];
+        }
+        byte[][] fileBytesContainer = { Base64.getDecoder().decode(base64) };
+        return fileBytesContainer[0];
+    }
 
-     public FileInfo uploadFile(MultipartFile file, String folderPath) {
-        String newKey = folderPath + "/" + UUID.randomUUID().toString() + file.getOriginalFilename().substring(file.getOriginalFilename().lastIndexOf("."));
+    public FileInfo uploadFile(FileInfoRequest file, String folderPath) {
+        String newKey = folderPath + "/" + UUID.randomUUID().toString() + file.fileName().substring(file.fileName().lastIndexOf("."));
         try {
+            byte[] bytes = parseBase64(file.base64());
             PutObjectRequest putObjectRequest = PutObjectRequest.builder()
                 .bucket(r2Properties.getBucketName())
                 .key(newKey)
-                .contentType(file.getContentType())
+                .contentType(file.contentType())
                 .build();
-            s3Client.putObject(putObjectRequest,
-                RequestBody.fromInputStream(file.getInputStream(), file.getSize()));
+
+            s3Client.putObject(putObjectRequest, RequestBody.fromBytes(bytes));
 
             FileInfo fileInfo = new FileInfo();
             fileInfo.setFileKey(newKey);
-            fileInfo.setMimeType(file.getContentType());
-            fileInfo.setSize(file.getSize());
+            fileInfo.setFileName(file.fileName());
+            fileInfo.setMimeType(file.contentType());
+            fileInfo.setSize((long) bytes.length);
+            
             return fileInfo;
-        } catch (IOException e) {
-            throw new RuntimeException("Error al subir archivo", e);
+
+        } catch (IllegalArgumentException e) {
+            throw new RuntimeException("El String Base64 enviado tiene un formato inválido", e);
+        } catch (Exception e) {
+            throw new RuntimeException("Error al subir el archivo decodificado a R2/S3", e);
         }
     }
 
-    public void safeReplace(FileInfo oldFile, MultipartFile newFile, String folderPath, Consumer<FileInfo> dbUpdateCallback) {
+    public void safeReplace(FileInfo oldFile, FileInfoRequest newFile, String folderPath, Consumer<FileInfo> dbUpdateCallback) {
         var newFileInfo = uploadFile(newFile, folderPath);
         try {
             dbUpdateCallback.accept(newFileInfo);

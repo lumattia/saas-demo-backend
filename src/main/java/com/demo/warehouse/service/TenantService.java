@@ -3,8 +3,6 @@ package com.demo.warehouse.service;
 import java.util.List;
 import java.util.UUID;
 
-import lombok.RequiredArgsConstructor;
-
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -25,6 +23,7 @@ import com.demo.warehouse.storage.FileStorageService;
 import com.demo.warehouse.tenantFilter.UserContextHolder;
 
 import jakarta.annotation.Nonnull;
+import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
@@ -108,7 +107,7 @@ public class TenantService {
         
         var logo = request.logo();
         if (logo != null) {
-            if (logo.isEmpty() && tenant.getLogo() != null) {
+            if (logo.base64().isEmpty() && tenant.getLogo() != null) {
                 FileInfo oldFile = tenant.getLogo();
                 tenant.setLogo(null);
                 tenantRepository.save(tenant);

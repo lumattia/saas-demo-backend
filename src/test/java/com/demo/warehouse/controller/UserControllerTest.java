@@ -33,6 +33,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import java.util.*;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -74,7 +75,7 @@ class UserControllerTest {
         tenant = TestFactory.createDefaultTenant();
         user = TestFactory.createDefaultUser(tenant);
         userResponse = TestFactory.createDefaultUserResponse(tenant);
-        loggedUserDto = new UserDto.LoggedUserDto(1L, "testuser", "auth0sub", UserRole.ADMIN, tenant);
+        loggedUserDto = new UserDto.LoggedUserDto(1L, "testuser", "auth0sub", UserRole.ADMIN, TestFactory.toTenantResponse(tenant));
 
         when(userRepository.findByAuth0Sub(anyString())).thenReturn(java.util.Optional.of(user));
         TestFactory.setUserContextHolder(user);
