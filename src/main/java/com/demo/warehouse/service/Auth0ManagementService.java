@@ -46,6 +46,8 @@ public class Auth0ManagementService {
     }
 
     public void deleteUser(String auth0Sub) {
+        if (auth0Sub == null || auth0Sub.isEmpty()) return;
+        
         try {
             String domain = issuer.replace("https://", "").replace("/", "");
             AuthAPI auth = AuthAPI.newBuilder(domain, clientId, clientSecret).build();

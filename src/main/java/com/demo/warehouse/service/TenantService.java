@@ -19,7 +19,6 @@ import com.demo.warehouse.mapper.TenantDtos;
 import com.demo.warehouse.mapper.TenantMapper;
 import com.demo.warehouse.repository.TenantRepository;
 import com.demo.warehouse.repository.UserRepository;
-import com.demo.warehouse.storage.FileStorageService;
 import com.demo.warehouse.tenantFilter.UserContextHolder;
 
 import jakarta.annotation.Nonnull;
@@ -117,8 +116,10 @@ public class TenantService {
                     tenant.setLogo(fileInfo);
                     tenantRepository.save(tenant);
                 });
+                return tenantMapper.toResponse(tenant);
             }
         }
+        tenantRepository.save(tenant);
         return tenantMapper.toResponse(tenant);
     }
     

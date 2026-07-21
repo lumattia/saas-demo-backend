@@ -1,4 +1,4 @@
-package com.demo.warehouse.storage;
+package com.demo.warehouse.service;
 
 import java.util.Base64;
 import java.util.UUID;
@@ -36,7 +36,12 @@ public class FileStorageService {
     }
 
     public FileInfo uploadFile(FileInfoRequest file, String folderPath) {
-        String newKey = folderPath + "/" + UUID.randomUUID().toString() + file.fileName().substring(file.fileName().lastIndexOf("."));
+        String extension = "";
+        int lastDotIndex = file.fileName().lastIndexOf(".");
+        if (lastDotIndex > 0) {
+            extension = file.fileName().substring(lastDotIndex);
+        }
+        String newKey = folderPath + "/" + UUID.randomUUID().toString() + extension;
         try {
             byte[] bytes = parseBase64(file.base64());
             PutObjectRequest putObjectRequest = PutObjectRequest.builder()

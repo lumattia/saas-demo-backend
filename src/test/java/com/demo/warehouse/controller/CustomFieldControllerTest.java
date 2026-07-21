@@ -177,7 +177,7 @@ class CustomFieldControllerTest {
             1L, 1L, "Updated Field", com.demo.warehouse.domain.CustomFieldType.TEXT, 1, new FieldValidations(false, null, null, null, null), null
         );
         
-        when(customFieldService.updateDefinition(any())).thenReturn(null);
+        when(customFieldService.updateDefinition(any())).thenReturn(response);
 
         mockMvc.perform(put("/custom-fields/definitions/1")
                         .with(csrf())

@@ -17,7 +17,7 @@ import com.demo.warehouse.domain.User;
 import com.demo.warehouse.repository.TenantRepository;
 import com.demo.warehouse.repository.UserRepository;
 import com.demo.warehouse.service.Auth0ManagementService;
-import com.demo.warehouse.storage.FileStorageService;
+import com.demo.warehouse.service.FileStorageService;
 
 @Slf4j
 @Component
