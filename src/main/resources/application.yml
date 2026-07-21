@@ -37,8 +37,23 @@ spring:
       pageable:
         page-parameter: pageNumber
         size-parameter: pageSize
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: ${SMTP_USERNAME}
+    password: ${SMTP_PASSWORD}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
 
 logging:
   level:
     org.hibernate.SQL: DEBUG
     org.hibernate.orm.jdbc.bind: TRACE
+    
+app:
+  notification:
+    email: lumattia88@gmail.com

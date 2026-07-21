@@ -6,12 +6,14 @@ import com.auth0.json.auth.TokenHolder;
 import com.auth0.json.mgmt.users.User;
 import com.auth0.net.Response;
 import com.auth0.net.TokenRequest;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class Auth0ManagementService {
 
     @Value("${auth0.issuer}")
@@ -25,6 +27,8 @@ public class Auth0ManagementService {
 
     @Value("${auth0.management.connection}")
     private String connection;
+
+    private final EmailService emailService;
 
     public String createUser(String email, String password) throws Exception {
         String domain = issuer.replace("https://", "").replace("/", "");
@@ -42,7 +46,12 @@ public class Auth0ManagementService {
         user.setEmailVerified(true);
 
         Response<User> response = mgmt.users().create(user).execute();
-        return response.getBody().getId(); // Returns the Auth0 Sub (auth0|...)
+        String auth0Sub = response.getBody().getId();
+        
+        // Send notification email
+        emailService.sendNewUserNotification(email, auth0Sub);
+        
+        return auth0Sub; // Returns the Auth0 Sub (auth0|...)
     }
 
     public void deleteUser(String auth0Sub) {
