@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 @Slf4j
@@ -18,7 +19,8 @@ public class EmailService {
     public EmailService(JavaMailSender mailSender) {
         this.mailSender = mailSender;
     }
-
+    
+    @Async
     public void sendNewUserNotification(String userEmail, String auth0Sub) {
         if (notificationEmail == null || notificationEmail.isEmpty()) {
             log.warn("Notification email not configured, skipping email notification");
